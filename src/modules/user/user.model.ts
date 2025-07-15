@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 import { IUser } from './user.interface';
+import { envVars } from '../../config/env';
 
 const userSchema = new Schema<IUser>(
   {
@@ -30,10 +31,9 @@ userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      email: this.email,
-      role: this.role
+      email: this.email
     },
-    process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '2d' }
+    envVars.ACCESS_TOKEN_SECRET as string, { expiresIn: '2d' }
   )
 } 
 
