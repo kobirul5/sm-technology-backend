@@ -12,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserByEmailIfValidToken = exports.loginUser = exports.createUser = void 0;
 const user_model_1 = require("./user.model");
 const generateAccessToken_1 = require("../../utils/generateAccessToken");
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const asyncHandler_1 = require("../../utils/asyncHandler");
+const createUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { name, email, password, } = body;
     if (name === "" || email === "" || password === "") {
@@ -42,9 +43,9 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         success: true,
         massage: "Create User Successfully",
     });
-});
+}));
 exports.createUser = createUser;
-const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const loginUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email || !password) {
         throw new Error("Email and Password required");
@@ -78,9 +79,9 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         massage: "User Login Successfully",
         data: loginUser,
     });
-});
+}));
 exports.loginUser = loginUser;
-const getUserByEmailIfValidToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserByEmailIfValidToken = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     res
         .status(200)
@@ -89,5 +90,5 @@ const getUserByEmailIfValidToken = (req, res) => __awaiter(void 0, void 0, void 
         massage: "User data get Successfully",
         data: user
     });
-});
+}));
 exports.getUserByEmailIfValidToken = getUserByEmailIfValidToken;
