@@ -3,10 +3,11 @@ import { Request, Response } from 'express'
 import { User } from './user.model';
 import { generateAccessToken } from '../../utils/generateAccessToken';
 import { AuthRequest } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = asyncHandler(async (req: Request, res: Response) => {
     const body = req.body;
     const { name, email, password, } = body;
 
@@ -49,9 +50,9 @@ const createUser = async (req: Request, res: Response) => {
             success: true,
             massage: "Create User Successfully",
         })
-}
+})
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -94,9 +95,9 @@ const loginUser = async (req: Request, res: Response) => {
             data: loginUser,
         })
 }
+)
 
-
-const getUserByEmailIfValidToken = async (req: AuthRequest, res: Response) => {
+const getUserByEmailIfValidToken = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user;
     res
         .status(200)
@@ -105,7 +106,7 @@ const getUserByEmailIfValidToken = async (req: AuthRequest, res: Response) => {
             massage: "User data get Successfully",
             data: user
         })
-}
+})
 
 
 
