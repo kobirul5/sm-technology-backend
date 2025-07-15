@@ -4,6 +4,7 @@ import { User } from './user.model';
 import { generateAccessToken } from '../../utils/generateAccessToken';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { asyncHandler } from '../../utils/asyncHandler';
+import AppError from '../../errorHelpers/AppError';
 
 
 
@@ -12,7 +13,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     const { name, email, password, } = body;
 
     if (name === "" || email === "" || password === "") {
-        throw new Error("Make Sure Name, Email and Password Not Empty")
+        throw new AppError(400, "Make Sure Name, Email and Password Not Empty")
     }
 
     const existUser = await User.findOne({
@@ -20,7 +21,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     })
 
     if (existUser) {
-        throw new Error("User With email Already Exist")
+        throw new AppError(401, "User With email Already Exist")
     }
 
     const user = await User.create(body)
@@ -30,7 +31,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     )
 
     if (!createdUser) {
-        throw new Error("Something is wrong while create user")
+        throw new AppError(400,"Something is wrong while create user")
     }
 
 
@@ -56,18 +57,18 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        throw new Error("Email and Password required")
+        throw new AppError(400,"Email and Password required")
     }
     // get user
     const user = await User.findOne({ email })
     if (!user) {
-        throw new Error("User Dose not exist")
+        throw new AppError(400,"User Dose not exist")
     }
     // passwordCheck
     const passwordCheck = await user.isPasswordCorrect(password.toString())
 
     if (!passwordCheck) {
-        throw new Error("Invalid user credentials")
+        throw new AppError(400,"Invalid user credentials")
     }
     // token
     const accessToken = await generateAccessToken(user._id.toString())
@@ -77,7 +78,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     )
 
     if (!loginUser) {
-        throw new Error("Something is wrong while login user")
+        throw new AppError(400,"Something is wrong while login user")
     }
 
     // cookie

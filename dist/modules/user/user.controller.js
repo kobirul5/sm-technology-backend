@@ -8,27 +8,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserByEmailIfValidToken = exports.loginUser = exports.createUser = void 0;
 const user_model_1 = require("./user.model");
 const generateAccessToken_1 = require("../../utils/generateAccessToken");
 const asyncHandler_1 = require("../../utils/asyncHandler");
+const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const createUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { name, email, password, } = body;
     if (name === "" || email === "" || password === "") {
-        throw new Error("Make Sure Name, Email and Password Not Empty");
+        throw new AppError_1.default(400, "Make Sure Name, Email and Password Not Empty");
     }
     const existUser = yield user_model_1.User.findOne({
         $or: [{ email }]
     });
     if (existUser) {
-        throw new Error("User With email Already Exist");
+        throw new AppError_1.default(401, "User With email Already Exist");
     }
     const user = yield user_model_1.User.create(body);
     const createdUser = yield user_model_1.User.findById(user._id).select("-password");
     if (!createdUser) {
-        throw new Error("Something is wrong while create user");
+        throw new AppError_1.default(400, "Something is wrong while create user");
     }
     const accessToken = yield (0, generateAccessToken_1.generateAccessToken)(user._id.toString());
     // cookie
@@ -48,23 +52,23 @@ exports.createUser = createUser;
 const loginUser = (0, asyncHandler_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email || !password) {
-        throw new Error("Email and Password required");
+        throw new AppError_1.default(400, "Email and Password required");
     }
     // get user
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
-        throw new Error("User Dose not exist");
+        throw new AppError_1.default(400, "User Dose not exist");
     }
     // passwordCheck
     const passwordCheck = yield user.isPasswordCorrect(password.toString());
     if (!passwordCheck) {
-        throw new Error("Invalid user credentials");
+        throw new AppError_1.default(400, "Invalid user credentials");
     }
     // token
     const accessToken = yield (0, generateAccessToken_1.generateAccessToken)(user._id.toString());
     const loginUser = yield user_model_1.User.findById(user._id).select("-password");
     if (!loginUser) {
-        throw new Error("Something is wrong while login user");
+        throw new AppError_1.default(400, "Something is wrong while login user");
     }
     // cookie
     const options = {
