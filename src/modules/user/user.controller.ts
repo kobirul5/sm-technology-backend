@@ -48,7 +48,6 @@ const createUser = async (req: Request, res: Response) => {
         .json({
             success: true,
             massage: "Create User Successfully",
-            token: accessToken
         })
 }
 
@@ -93,7 +92,6 @@ const loginUser = async (req: Request, res: Response) => {
             success: true,
             massage: "User Login Successfully",
             data: loginUser,
-            token: accessToken
         })
 }
 

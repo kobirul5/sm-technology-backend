@@ -41,7 +41,6 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         .json({
         success: true,
         massage: "Create User Successfully",
-        token: accessToken
     });
 });
 exports.createUser = createUser;
@@ -78,7 +77,6 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         success: true,
         massage: "User Login Successfully",
         data: loginUser,
-        token: accessToken
     });
 });
 exports.loginUser = loginUser;
