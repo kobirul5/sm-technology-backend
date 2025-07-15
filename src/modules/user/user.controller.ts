@@ -52,6 +52,51 @@ const createUser = async (req: Request, res: Response) => {
     })
 }
 
+const loginUser = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new Error("Email and Password required")
+    }
+    // get user
+    const user = await User.findOne({ email })
+    if (!user) {
+        throw new Error("User Dose not exist")
+    }
+    // passwordCheck
+    const passwordCheck = await user.isPasswordCorrect(password.toString())
+
+    if (!passwordCheck) {
+        throw new Error("Invalid user credentials")
+    }
+    // token
+    const accessToken = await generateAccessToken(user._id.toString())
+
+    const loginUser = await User.findById(user._id).select(
+        "-password"
+    )
+
+    if (!loginUser) {
+        throw new Error("Something is wrong while login user")
+    }
+
+    // cookie
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json({
+            success: true,
+            massage: "User Login Successfully",
+            data: loginUser,
+            token: accessToken
+        })
+}
 
 
-export {createUser}
+
+export {createUser, loginUser}
