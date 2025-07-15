@@ -2,10 +2,12 @@ import { Request, Response } from 'express'
 
 import { User } from './user.model';
 import { generateAccessToken } from '../../utils/generateAccessToken';
+import { AuthRequest } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = asyncHandler(async (req: Request, res: Response) => {
     const body = req.body;
     const { name, email, password, } = body;
 
@@ -42,16 +44,71 @@ const createUser = async (req: Request, res: Response) => {
     }
 
     res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .json({
-        success: true,
-        massage: "Create User Successfully",
-        data: createdUser,
-        token: accessToken
-    })
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json({
+            success: true,
+            massage: "Create User Successfully",
+        })
+})
+
+const loginUser = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new Error("Email and Password required")
+    }
+    // get user
+    const user = await User.findOne({ email })
+    if (!user) {
+        throw new Error("User Dose not exist")
+    }
+    // passwordCheck
+    const passwordCheck = await user.isPasswordCorrect(password.toString())
+
+    if (!passwordCheck) {
+        throw new Error("Invalid user credentials")
+    }
+    // token
+    const accessToken = await generateAccessToken(user._id.toString())
+
+    const loginUser = await User.findById(user._id).select(
+        "-password"
+    )
+
+    if (!loginUser) {
+        throw new Error("Something is wrong while login user")
+    }
+
+    // cookie
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json({
+            success: true,
+            massage: "User Login Successfully",
+            data: loginUser,
+        })
 }
+)
+
+const getUserByEmailIfValidToken = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = req.user;
+    res
+        .status(200)
+        .json({
+            success: true,
+            massage: "User data get Successfully",
+            data: user
+        })
+})
 
 
 
-export {createUser}
+
+export { createUser, loginUser, getUserByEmailIfValidToken }
