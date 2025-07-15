@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 
 import { User } from './user.model';
 import { generateAccessToken } from '../../utils/generateAccessToken';
+import { AuthRequest } from '../../middlewares/auth.middleware';
 
 
 
@@ -42,14 +43,13 @@ const createUser = async (req: Request, res: Response) => {
     }
 
     res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .json({
-        success: true,
-        massage: "Create User Successfully",
-        data: createdUser,
-        token: accessToken
-    })
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json({
+            success: true,
+            massage: "Create User Successfully",
+            token: accessToken
+        })
 }
 
 const loginUser = async (req: Request, res: Response) => {
@@ -98,5 +98,18 @@ const loginUser = async (req: Request, res: Response) => {
 }
 
 
+const getUserByEmailIfValidToken = async (req: AuthRequest, res: Response) => {
+    const user = req.user;
+    res
+        .status(200)
+        .json({
+            success: true,
+            massage: "User data get Successfully",
+            data: user
+        })
+}
 
-export {createUser, loginUser}
+
+
+
+export { createUser, loginUser, getUserByEmailIfValidToken }
