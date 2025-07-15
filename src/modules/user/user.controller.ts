@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
-import { generateAccessToken } from '../../utils/genareteAccesToken';
+
 import { User } from './user.model';
+import { generateAccessToken } from '../../utils/generateAccessToken';
 
 
 
